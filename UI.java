@@ -30,7 +30,7 @@ public class UI
     public static void UILoop()
     {
         input.nextLine();
-        while(true)
+        loop: while(true)
         {
             System.out.println("\nWhat would you like to do? (type the option you want)\n");
             System.out.println("Create guest account");
@@ -40,15 +40,35 @@ public class UI
             System.out.println("Check out guest");
             System.out.println("View room");
             System.out.println("Find rooms");
+            System.out.println("Exit the program");
             String option = input.nextLine().toLowerCase();
             switch(option){
-                case "create guest account": createGuestAccount(); break;
-                case "view guest account" : viewGuest(); break;
-                case "check in guest manually" : manualCheckIn(); break;
-                case "check in guest automatically" : autoCheckIn(); break;
-                case "check out guest" : checkOut(); break;
-                case "view room" : viewRoom(); break;
-                case "find rooms" : findRooms(); break;
+                case "create guest account": 
+                    createGuestAccount(); 
+                    break;
+                case "view guest account" : 
+                    viewGuest(); 
+                    break;
+                case "check in guest manually" : 
+                    manualCheckIn(); 
+                    break;
+                case "check in guest automatically" : 
+                    autoCheckIn(); 
+                    break;
+                case "check out guest" : 
+                    checkOut(); 
+                    break;
+                case "view room" : 
+                    viewRoom(); 
+                    break;
+                case "find rooms" : 
+                    findRooms(); 
+                    break;
+                case "exit the program" : 
+                    break loop;
+                default : 
+                    System.out.println("You made a mistake, try again."); 
+                    break;
             }
             
         }
@@ -287,11 +307,24 @@ public class UI
             System.out.println("Suite");
             String option = input.nextLine().toLowerCase();
             switch(option){
-                case "single": preferredRoomSize = RoomSize.SINGLE; break;
-                case "double" : preferredRoomSize = RoomSize.DOUBLE; break;
-                case "queen single" : preferredRoomSize = RoomSize.QSINGLE; break;
-                case "queen double" : preferredRoomSize = RoomSize.QDOUBLE; break;
-                case "suite" : preferredRoomSize = RoomSize.SUITE; break;
+                case "single": 
+                    preferredRoomSize = RoomSize.SINGLE; 
+                    break;
+                case "double" : 
+                    preferredRoomSize = RoomSize.DOUBLE; 
+                    break;
+                case "queen single" : 
+                    preferredRoomSize = RoomSize.QSINGLE; 
+                    break;
+                case "queen double" : 
+                    preferredRoomSize = RoomSize.QDOUBLE; 
+                    break;
+                case "suite" : 
+                    preferredRoomSize = RoomSize.SUITE; 
+                    break;
+                default :
+                    System.out.println("Please enter a valid room size.");
+                    break;
             }
         } while(preferredRoomSize == null);
         
@@ -424,11 +457,24 @@ public class UI
                 System.out.println("Suite");
                 String option = input.nextLine().toLowerCase();
                 switch(option){
-                    case "single": roomSize = RoomSize.SINGLE; break;
-                    case "double" : roomSize = RoomSize.DOUBLE; break;
-                    case "queen single" : roomSize = RoomSize.QSINGLE; break;
-                    case "queen double" : roomSize = RoomSize.QDOUBLE; break;
-                    case "suite" : roomSize = RoomSize.SUITE; break;
+                    case "single": 
+                        roomSize = RoomSize.SINGLE; 
+                        break;
+                    case "double" : 
+                        roomSize = RoomSize.DOUBLE; 
+                        break;
+                    case "queen single" : 
+                        roomSize = RoomSize.QSINGLE; 
+                        break;
+                    case "queen double" : 
+                        roomSize = RoomSize.QDOUBLE; 
+                        break;
+                    case "suite" : 
+                        roomSize = RoomSize.SUITE; 
+                        break;
+                    default :
+                        System.out.println("Please enter a valid room size.");
+                        break;
                 }
             } while(roomSize == null);
         }
@@ -459,6 +505,7 @@ public class UI
         int num;
         int floor;
         Guest guest;
+        Room room;
         
         System.out.println("What is the guest's ID number?");
         do{
@@ -498,15 +545,16 @@ public class UI
                 if(num < 0 || num > hotel.getRoomsPerFloor() - 1){
                     System.out.println("That room does not exist. Enter again.");
                 }
-                
             } while(num < 0 || num > hotel.getRoomsPerFloor() - 1);
-            if(hotel.getRoom(floor, num).isChecked()){
+            room = hotel.getRoom(floor, num);
+            if(room.isChecked()){
                 System.out.println("That room is occupied. Try another one");
             }
-        } while(hotel.getRoom(floor, num).isChecked());
+        } while(room.isChecked());
         
         System.out.println("The guest has been checked in");
-        hotel.getRoom(floor, num).checkIn(guest);
+        room.checkIn(guest);
+        System.out.println("that room costs " + hotel.getPrice(room, guest) + " Dollars.");
     }
     
     /**
@@ -542,6 +590,7 @@ public class UI
             room.checkIn(guest);
             System.out.println("The guest has been checked in to the following room:");
             System.out.println(room);
+            System.out.println("that room costs " + hotel.getPrice(room, guest) + " Dollars.");
         }
     }
     
@@ -581,5 +630,5 @@ public class UI
             room.checkOut(guest);
         }
     }
-
+    
 }
