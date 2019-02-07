@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 /**
  * Handles all interactions with the user.
  *
@@ -27,35 +28,42 @@ public class UI
      * @param  
      * @return    
      */
-    public static void UILoop()
+    private static void UILoop()
     {
-        input.nextLine();
+        //input.nextLine();
         loop: while(true)
         {
+            System.out.println("\nPress enter to continue.");
+            input.nextLine();
+            
             System.out.println("\nWhat would you like to do? (type the option you want)\n");
-            System.out.println("Create guest account");
-            System.out.println("View guest account");
-            System.out.println("Check in guest manually");
-            System.out.println("Check in guest automatically");
-            System.out.println("Check out guest");
+            System.out.println("Create account");
+            System.out.println("View account");
+            System.out.println("View all accounts");
+            System.out.println("Check in");
+            System.out.println("Check in automatically");
+            System.out.println("Check out");
             System.out.println("View room");
             System.out.println("Find rooms");
-            System.out.println("Exit the program");
+            System.out.println("Exit");
             String option = input.nextLine().toLowerCase();
             switch(option){
-                case "create guest account": 
+                case "create account": 
                     createGuestAccount(); 
                     break;
-                case "view guest account" : 
+                case "view account" : 
                     viewGuest(); 
                     break;
-                case "check in guest manually" : 
+                case "view all accounts" : 
+                    viewAllGuests(); 
+                    break;
+                case "check in" : 
                     manualCheckIn(); 
                     break;
-                case "check in guest automatically" : 
+                case "check in automatically" : 
                     autoCheckIn(); 
                     break;
-                case "check out guest" : 
+                case "check out" : 
                     checkOut(); 
                     break;
                 case "view room" : 
@@ -64,7 +72,7 @@ public class UI
                 case "find rooms" : 
                     findRooms(); 
                     break;
-                case "exit the program" : 
+                case "exit" : 
                     break loop;
                 default : 
                     System.out.println("You made a mistake, try again."); 
@@ -80,7 +88,7 @@ public class UI
      * @param  
      * @return    
      */
-    public static void setUp()
+    private static void setUp()
     {
         String name;
         int floors;
@@ -227,7 +235,11 @@ public class UI
         } while(floorPriceIncrease < 0);
         
         System.out.println("Your hotel has been created.");
-        //hotel = new Hotel(floors, singles, doubles, queen, doubleQueen, suite, milDiscount, govDiscount, memberDiscount, floorPriceIncrease);
+        hotel = new Hotel(floors, singles, doubles, queen, doubleQueen, suite, milDiscount, govDiscount, memberDiscount, floorPriceIncrease);
+        
+        //test scanner fix:
+        input.nextLine();
+        
         UILoop();
     }
     
@@ -237,67 +249,109 @@ public class UI
      * @param  
      * @return   
      */
-    public static void createGuestAccount()
+    private static void createGuestAccount()
     {
         String name;
         int id;
         boolean isMember;
         boolean isMil;
         boolean isGov;
-        int preferredFloor;
+        int preferredFloor = 0;
+        String option;
         //CHECK ENUM NAME
-        RoomSize preferredRoomSize;
+        RoomSize preferredRoomSize = RoomSize.NULL;
         
         System.out.println("What is the guest's name?");
         name = input.nextLine();
         
-        //MAYBE ADD INT LENGTH CONSTRAINT OR VERIFY UNIQUENESS
         System.out.println("What is the guest's ID number?");
         do{
-            while(!input.hasNextInt()){
-                System.out.println("you must enter an integer");
-                input.next();
-            }
-            id = input.nextInt();
-            if(id < 0){
-                System.out.println("The ID cannot be negative.");
-            }
-        } while(id < 0);
+            do{
+                while(!input.hasNextInt()){
+                    System.out.println("you must enter an integer");
+                    input.next();
+                }
+                id = input.nextInt();
+                if(id < 0){
+                    System.out.println("The ID cannot be negative.");
+                } else if (hotel.isIdUsed(id)){
+                    System.out.println("That ID is already in use");
+                }
+            } while(id < 0);
+        } while (hotel.isIdUsed(id));
         
-        System.out.println("Is the guest a member?");
-        while(!input.hasNextBoolean()){
-                System.out.println("you must enter a boolean");
-                input.next();
+        System.out.println("Is the guest a member? (yes or no)");
+        input.nextLine();
+        do{
+            option = input.nextLine().toLowerCase();
+            if(!option.equals("yes") && !option.equals("no")){
+                System.out.println("You must answer with yes or no");
             }
-        isMember = input.nextBoolean();
+        } while(!option.equals("yes") && !option.equals("no"));
+        switch(option){
+            case "yes":
+                isMember = true;
+                break;
+            case "no":
+                isMember = false;
+                break;
+            default:
+                isMember = false;  //Will never happen, but is necessary to compile
+                break;
+        }
         
-        System.out.println("Is the guest in the military?");
-        while(!input.hasNextBoolean()){
-                System.out.println("you must enter a boolean");
-                input.next();
+        System.out.println("Is the guest in the military? (yes or no)");
+        do{
+            option = input.nextLine().toLowerCase();
+            if(!option.equals("yes") && !option.equals("no")){
+                System.out.println("You must answer with yes or no");
             }
-        isMil = input.nextBoolean();
+        } while(!option.equals("yes") && !option.equals("no"));
+        switch(option){
+            case "yes":
+                isMil = true;
+                break;
+            case "no":
+                isMil = false;
+                break;
+            default:
+                isMil = false;  //Will never happen, but is necessary to compile
+                break;
+        }
         
-        System.out.println("Does the guest work for the government");
-        while(!input.hasNextBoolean()){
-                System.out.println("you must enter a boolean");
-                input.next();
+        System.out.println("Does the guest work for the government (yes or no)");
+        do{
+            option = input.nextLine().toLowerCase();
+            if(!option.equals("yes") && !option.equals("no")){
+                System.out.println("You must answer with yes or no");
             }
-        isGov = input.nextBoolean();
+        } while(!option.equals("yes") && !option.equals("no"));
+        switch(option){
+            case "yes":
+                isGov = true;
+                break;
+            case "no":
+                isGov = false;
+                break;
+            default:
+                isGov = false;  //Will never happen, but is necessary to compile
+                break;
+        }
         
-        System.out.println("What is the guest's preferred floor");
+        System.out.println("What is the guest's preferred floor (Floors start at 0 like in Europe)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
                 input.next();
             }
             preferredFloor = input.nextInt();
-            if(preferredFloor < 0 || preferredFloor > hotel.getFloors() - 1){
+            int floors = hotel.getFloors();
+            if(preferredFloor < 0 || preferredFloor > floors - 1){
                 System.out.println("That is not a valid floor");
             }
         } while(preferredFloor < 0 || preferredFloor > hotel.getFloors() - 1);
         
-        //CHECK ENUM CORRECTNESS
+        input.nextLine();
         do{
             System.out.println("\nWhat is the guest's preferred room size?\n");
             System.out.println("Single");
@@ -305,7 +359,7 @@ public class UI
             System.out.println("Queen Single");
             System.out.println("Queen Double");
             System.out.println("Suite");
-            String option = input.nextLine().toLowerCase();
+            option = input.nextLine().toLowerCase();
             switch(option){
                 case "single": 
                     preferredRoomSize = RoomSize.SINGLE; 
@@ -326,10 +380,9 @@ public class UI
                     System.out.println("Please enter a valid room size.");
                     break;
             }
-        } while(preferredRoomSize == null);
+        } while(preferredRoomSize == RoomSize.NULL);
         
-        //CONFIRM PARAMETERS WITH GAVIN
-        hotel.createGuest(id, name, isMil, isGov, isMember, preferredRoomSize, preferredFloor);
+        hotel.createGuest(name, id, isMil, isGov, isMember, preferredRoomSize, preferredFloor);
         System.out.println("Guest account successfuly created.");
     }
     
@@ -339,27 +392,43 @@ public class UI
      * @param  
      * @return    
      */
-    public static void viewGuest()
+    private static void viewGuest()
     {
-        //MAYBE IMPLEMENT ID LENGTH REQUIREMENT
         int id;
         Guest guest;
         
-        System.out.println("What is the guest's ID number?");
+        System.out.println("What is the guest's ID number? (enter -1 to cancel)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
                 input.next();
             }
             id = input.nextInt();
+            if(id == -1){
+                input.nextLine();
+                return;
+            }
             guest = hotel.getGuest(id);
             if(guest == null){
-                System.out.println("There is not guest with that ID");
+                System.out.println("There is no guest with that ID");
             }
         } while(guest == null);
         
+        //test scanner stuff
+        input.nextLine();
+        
         System.out.println("The guest with that ID is:");
         System.out.println(guest);
+    }
+    
+    /**
+     * prints out information for each guest account
+     *  
+     */
+    private static void viewAllGuests() 
+    {
+        String res = hotel.viewAllGuests();
+        System.out.println(res);
     }
     
     /**
@@ -368,13 +437,13 @@ public class UI
      * @param  
      * @return    
      */
-    public static void viewRoom()
+    private static void viewRoom()
     {
         int floor;
         int num;
         
         //asks for the floor
-        System.out.println("What floor is the room on?");
+        System.out.println("Which floor is the room on? (Floors start at 0 like in Europe)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
@@ -387,7 +456,7 @@ public class UI
         } while(floor < 0 || floor > hotel.getFloors() - 1);
         
         //asks for the number
-        System.out.println("What is the room's number?");
+        System.out.println("What is the room's number? (they start at 0)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
@@ -399,6 +468,9 @@ public class UI
             }
         } while(num < 0 || num > hotel.getRoomsPerFloor() - 1);
         
+         
+        input.nextLine();
+        
         System.out.println("The room at that location is:");
         System.out.println(hotel.getRoom(floor, num));
     }
@@ -409,76 +481,57 @@ public class UI
      * @param  
      * @return    
      */
-    public static void findRooms()
+    private static void findRooms()
     {
-        RoomSize roomSize;
-        int floor;
-        boolean hasFloorPreference;
-        boolean hasSizePreference;
-        ArrayList<Room> rooms;
+        RoomSize roomSize = RoomSize.NULL;
+        int floor = 0;
+        ArrayList<Room> rooms = new ArrayList<Room>();
         
-        System.out.println("Do you have a preference for the floor?");
-        while(!input.hasNextBoolean()){
-                System.out.println("you must enter a boolean");
+        //asks for the floor
+        System.out.println("Which floor? (Floors start at 0 like in Europe)");
+        do{
+            while(!input.hasNextInt()){
+                System.out.println("you must enter an integer");
                 input.next();
             }
-        hasFloorPreference = input.nextBoolean();
-        
-        if(hasFloorPreference){
-            //asks for the floor
-            System.out.println("Which floor?");
-            do{
-                while(!input.hasNextInt()){
-                    System.out.println("you must enter an integer");
-                    input.next();
-                }
-                floor = input.nextInt();
-                if(floor < 0 || floor > hotel.getFloors() - 1){
-                    System.out.println("That floor does not exist. Enter again.");
-                }
-            } while(floor < 0 || floor > hotel.getFloors() - 1);
-        }
-        
-        System.out.println("Do you have a preference for the room size?");
-        while(!input.hasNextBoolean()){
-                System.out.println("you must enter a boolean");
-                input.next();
+            floor = input.nextInt();
+            if(floor < 0 || floor > hotel.getFloors() - 1){
+                System.out.println("That floor does not exist. Enter again.");
             }
-        hasSizePreference = input.nextBoolean();
+        } while(floor < 0 || floor > hotel.getFloors() - 1);
         
-        if(hasSizePreference){
-            //asks for the room size
-            do{
-                System.out.println("\nWhat is the size of the room?\n");
-                System.out.println("Single");
-                System.out.println("Double");
-                System.out.println("Queen Single");
-                System.out.println("Queen Double");
-                System.out.println("Suite");
-                String option = input.nextLine().toLowerCase();
-                switch(option){
-                    case "single": 
-                        roomSize = RoomSize.SINGLE; 
-                        break;
-                    case "double" : 
-                        roomSize = RoomSize.DOUBLE; 
-                        break;
-                    case "queen single" : 
-                        roomSize = RoomSize.QSINGLE; 
-                        break;
-                    case "queen double" : 
-                        roomSize = RoomSize.QDOUBLE; 
-                        break;
-                    case "suite" : 
-                        roomSize = RoomSize.SUITE; 
-                        break;
-                    default :
-                        System.out.println("Please enter a valid room size.");
-                        break;
-                }
-            } while(roomSize == null);
-        }
-        
+        //asks for the room size
+        input.nextLine();
+        do{
+            System.out.println("\nWhat is the size of the room?\n");
+            System.out.println("Single");
+            System.out.println("Double");
+            System.out.println("Queen Single");
+            System.out.println("Queen Double");
+            System.out.println("Suite");
+            String option = input.nextLine().toLowerCase();
+            switch(option){
+                case "single": 
+                    roomSize = RoomSize.SINGLE; 
+                    break;
+                case "double" : 
+                    roomSize = RoomSize.DOUBLE; 
+                    break;
+                case "queen single" : 
+                    roomSize = RoomSize.QSINGLE; 
+                    break;
+                case "queen double" : 
+                    roomSize = RoomSize.QDOUBLE; 
+                    break;
+                case "suite" : 
+                    roomSize = RoomSize.SUITE; 
+                    break;
+                default :
+                    System.out.println("Please enter a valid room size.");
+                    break;
+            }
+        } while(roomSize == RoomSize.NULL);
+    
         rooms = hotel.findRooms(floor, roomSize);
         if(rooms.isEmpty()){
             System.out.println("No rooms meet your specifications.");
@@ -486,10 +539,9 @@ public class UI
             System.out.println("These are the rooms that met your requirements:");
             for(Room room : rooms){
                 System.out.println();
-                System.out.print(room);
+                System.out.println(room);
             }
         }
-        
     }
     
     /**
@@ -498,31 +550,36 @@ public class UI
      * @param  
      * @return    
      */
-    public static void manualCheckIn()
+    private static void manualCheckIn()
     {
-        //MAYBE IMPLEMENT ID LENGTH REQUIREMENT
         int id;
         int num;
         int floor;
         Guest guest;
         Room room;
         
-        System.out.println("What is the guest's ID number?");
+        System.out.println("What is the guest's ID number? (enter -1 to cancel)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
                 input.next();
             }
             id = input.nextInt();
+            if(id == -1){
+                input.nextLine();
+                return;
+            }
             guest = hotel.getGuest(id);
             if(guest == null){
-                System.out.println("There is not guest with that ID");
+                System.out.println("There's no guest with that ID");
+            } else if(guest.getRoom() != null){
+                System.out.println("That guest is already in a room");
             }
-        } while(guest == null);
+        } while(guest == null || guest.getRoom() != null);
         
         do{
             //asks for the floor
-            System.out.println("What floor is the room on?");
+            System.out.println("What floor is the room on? (Floors start at 0 like in Europe)");
             do{
                 while(!input.hasNextInt()){
                     System.out.println("you must enter an integer");
@@ -535,23 +592,28 @@ public class UI
             } while(floor < 0 || floor > hotel.getFloors() - 1);
             
             //asks for the room number
-            System.out.println("What is the room's number?");
+            System.out.println("What is the room's number? (they start at 0) (enter -1 to cancel)");
             do{
                 while(!input.hasNextInt()){
                     System.out.println("you must enter an integer");
                     input.next();
                 }
                 num = input.nextInt();
+                if(num == -1){
+                    input.nextLine();
+                    return;
+                }
                 if(num < 0 || num > hotel.getRoomsPerFloor() - 1){
                     System.out.println("That room does not exist. Enter again.");
                 }
             } while(num < 0 || num > hotel.getRoomsPerFloor() - 1);
             room = hotel.getRoom(floor, num);
-            if(room.isChecked()){
+            if(room.getIsChecked()){
                 System.out.println("That room is occupied. Try another one");
             }
-        } while(room.isChecked());
+        } while(room.getIsChecked());
         
+        input.nextLine();
         System.out.println("The guest has been checked in");
         room.checkIn(guest);
         System.out.println("that room costs " + hotel.getPrice(room, guest) + " Dollars.");
@@ -563,25 +625,31 @@ public class UI
      * @param  
      * @return    
      */
-    public static void autoCheckIn()
+    private static void autoCheckIn()
     {
         //MAYBE IMPLEMENT ID LENGTH REQUIREMENT
         int id;
         Guest guest;
         Room room;
         
-        System.out.println("What is the guest's ID number?");
+        System.out.println("What is the guest's ID number? (enter -1 to cancel)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
                 input.next();
             }
             id = input.nextInt();
+            if(id == -1){
+                input.nextLine();
+                return;
+            }
             guest = hotel.getGuest(id);
             if(guest == null){
-                System.out.println("There is not guest with that ID");
+                System.out.println("There is no guest with that ID");
+            } else if(guest.getRoom() != null){
+                System.out.println("That guest is already in a room");
             }
-        } while(guest == null);
+        } while(guest == null || guest.getRoom() != null);
         
         room = hotel.findRoom(guest);
         if(room == null){
@@ -592,6 +660,8 @@ public class UI
             System.out.println(room);
             System.out.println("that room costs " + hotel.getPrice(room, guest) + " Dollars.");
         }
+        
+        input.nextLine();
     }
     
     /**
@@ -600,7 +670,7 @@ public class UI
      * @param  
      * @return    
      */
-    public static void checkOut()
+    private static void checkOut()
     {
         //MAYBE IMPLEMENT ID LENGTH REQUIREMENT
         int id;
@@ -609,16 +679,20 @@ public class UI
         Guest guest;
         Room room;
         
-        System.out.println("What is the guest's ID number?");
+        System.out.println("What is the guest's ID number? (enter -1 to cancel)");
         do{
             while(!input.hasNextInt()){
                 System.out.println("you must enter an integer");
                 input.next();
             }
             id = input.nextInt();
+            if(id == -1){
+                input.nextLine();
+                return;
+            }
             guest = hotel.getGuest(id);
             if(guest == null){
-                System.out.println("There is not guest with that ID");
+                System.out.println("There is no guest with that ID");
             }
         } while(guest == null);
         
@@ -627,8 +701,10 @@ public class UI
             System.out.println("That guest is not currently staying in the hotel.");
         } else {
             System.out.println("The guest has been checked out");
-            room.checkOut(guest);
+            room.checkOut();
         }
+         
+        input.nextLine();
     }
     
 }
